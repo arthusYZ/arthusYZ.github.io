@@ -88,23 +88,30 @@
 
 
 <meta name="description" content="虽然做了很久iOS开发了，但到目前对于网络这一块还是不知其所以然，最近也是下决心补一下这块知识，所以也是选择了《图解HTTP》作为入门书籍。
+***** 
+了解Web及网络基础![][image-1]
 
-了解Web及网络基础">
+如上图所示，一个Web页面能显示出来需要一个客户端和一个服务器。而通过发送请求获取服务器资源的Web浏览器等，都可以成为客户端（client）。
+而我们平时经常接触到的HTTP协议就是作为一个规范">
 <meta property="og:type" content="article">
 <meta property="og:title" content="《图解HTTP》笔记（一）">
 <meta property="og:url" content="http://yoursite.com/2017/03/15/《图解HTTP》笔记（一）/index.html">
 <meta property="og:site_name" content="舟'Blog">
 <meta property="og:description" content="虽然做了很久iOS开发了，但到目前对于网络这一块还是不知其所以然，最近也是下决心补一下这块知识，所以也是选择了《图解HTTP》作为入门书籍。
+***** 
+了解Web及网络基础![][image-1]
 
-了解Web及网络基础">
-<meta property="og:image" content="http://omu22b4eh.bkt.clouddn.com/book_http_chapter_1_1.png">
-<meta property="og:updated_time" content="2017-03-15T07:41:18.000Z">
+如上图所示，一个Web页面能显示出来需要一个客户端和一个服务器。而通过发送请求获取服务器资源的Web浏览器等，都可以成为客户端（client）。
+而我们平时经常接触到的HTTP协议就是作为一个规范">
+<meta property="og:updated_time" content="2017-03-15T09:09:15.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《图解HTTP》笔记（一）">
 <meta name="twitter:description" content="虽然做了很久iOS开发了，但到目前对于网络这一块还是不知其所以然，最近也是下决心补一下这块知识，所以也是选择了《图解HTTP》作为入门书籍。
+***** 
+了解Web及网络基础![][image-1]
 
-了解Web及网络基础">
-<meta name="twitter:image" content="http://omu22b4eh.bkt.clouddn.com/book_http_chapter_1_1.png">
+如上图所示，一个Web页面能显示出来需要一个客户端和一个服务器。而通过发送请求获取服务器资源的Web浏览器等，都可以成为客户端（client）。
+而我们平时经常接触到的HTTP协议就是作为一个规范">
 
 
 
@@ -330,11 +337,42 @@
 
       
         <p>虽然做了很久iOS开发了，但到目前对于网络这一块还是不知其所以然，最近也是下决心补一下这块知识，所以也是选择了《图解HTTP》作为入门书籍。</p>
-<hr>
-<h1 id="了解Web及网络基础"><a href="#了解Web及网络基础" class="headerlink" title="了解Web及网络基础"></a>了解Web及网络基础</h1><div align="center"><img src="http://omu22b4eh.bkt.clouddn.com/book_http_chapter_1_1.png" alt=""></div>
+<p>***** </p>
+<h1 id="了解Web及网络基础"><a href="#了解Web及网络基础" class="headerlink" title="了解Web及网络基础"></a>了解Web及网络基础</h1><div align="center">![][image-1]</div>
 
-
-
+<p>如上图所示，一个Web页面能显示出来需要一个客户端和一个服务器。而<font size="3"><em>通过发送请求获取服务器资源的Web浏览器等，都可以成为客户端（client）</em></font>。</p>
+<p>而我们平时经常接触到的HTTP协议就是作为一个规范标准以完成从客户端到服务器端等的一系列运作流程。可以说<font size="3"><em>Web是建立在HTTP协议上进行通信的</em></font>。</p>
+<h2 id="一个标准的网络请求过程"><a href="#一个标准的网络请求过程" class="headerlink" title="一个标准的网络请求过程"></a>一个标准的网络请求过程</h2><ol>
+<li>客户端输入URL<br> 一个标准的URL组成部分为<ul>
+<li>协议（比如HTTP，FTP）</li>
+<li>域名（比如baidu.com）</li>
+<li>文件路径（比如/HDD/hexo/_post/a.MD）</li>
+<li>端口（比如:4000）</li>
+</ul>
+</li>
+<li>查找域名的IP<ol>
+<li>查找本地hosts文件</li>
+<li>DNS查询<ol>
+<li>询问本地域名服务器</li>
+<li>询问根域名服务器</li>
+</ol>
+</li>
+<li>返回服务器IP地址</li>
+</ol>
+</li>
+<li>客户端向服务器的IP地址发送一个HTTP请求</li>
+<li>服务器处理请求</li>
+<li>服务器发回一个响应</li>
+<li>客户端开始处理响应</li>
+<li><p>客户端开始显示响应</p>
+<p>详情可以看：</p>
+<ul>
+<li><a href="https://github.com/skyline75489/what-happens-when-zh_CN" target="_blank" rel="external">当···时发生了什么？</a></li>
+<li><a href="https://www.zhihu.com/question/34873227" target="_blank" rel="external">在浏览器地址栏输入一个URL后回车，背后会进行哪些技术步骤？</a></li>
+</ul>
+</li>
+</ol>
+<h2 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h2>
       
     </div>
 
@@ -516,7 +554,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#了解Web及网络基础"><span class="nav-number">1.</span> <span class="nav-text">了解Web及网络基础</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#了解Web及网络基础"><span class="nav-number">1.</span> <span class="nav-text">了解Web及网络基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一个标准的网络请求过程"><span class="nav-number">1.1.</span> <span class="nav-text">一个标准的网络请求过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP"><span class="nav-number">1.2.</span> <span class="nav-text">HTTP</span></a></li></ol></li></ol></div>
             
 
           </div>
