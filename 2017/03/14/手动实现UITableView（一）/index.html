@@ -95,13 +95,13 @@
 <meta property="og:site_name" content="舟'Blog">
 <meta property="og:description" content="我们在做关于iOS的UI相关工作时，经常会用到一个组件-UITableView。在上章我们了解了ScrollView的实现原理，而TableView是ScrollView的子类，我们可以通过用ScrollView实现TableView来深入理解UIKit的一些技术细节，对iOS UI编程所使用的工具有更深入的了解。这样，我们在平时的工作中才不会捉襟见肘。
 我们接下来会参照GitHub上的一个项目进">
-<meta property="og:image" content="http://jbcdn2.b0.upaiyun.com/2014/03/4a925d337d1b73ce992333a9015348ee.png">
-<meta property="og:updated_time" content="2017-03-15T01:13:41.000Z">
+<meta property="og:image" content="http://omu22b4eh.bkt.clouddn.com/hexo-ScrollView.png">
+<meta property="og:updated_time" content="2017-03-15T02:18:20.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="手动实现UITableView（一）">
 <meta name="twitter:description" content="我们在做关于iOS的UI相关工作时，经常会用到一个组件-UITableView。在上章我们了解了ScrollView的实现原理，而TableView是ScrollView的子类，我们可以通过用ScrollView实现TableView来深入理解UIKit的一些技术细节，对iOS UI编程所使用的工具有更深入的了解。这样，我们在平时的工作中才不会捉襟见肘。
 我们接下来会参照GitHub上的一个项目进">
-<meta name="twitter:image" content="http://jbcdn2.b0.upaiyun.com/2014/03/4a925d337d1b73ce992333a9015348ee.png">
+<meta name="twitter:image" content="http://omu22b4eh.bkt.clouddn.com/hexo-ScrollView.png">
 
 
 
@@ -332,7 +332,7 @@
 <p>在UIKit的几何布局模型中核心的一个数据结构是：CGRect，它确定了一个View（或者Layer，我们这里先只考虑View的情况，想不详细展开来说其他的）在父View中坐标系的绝对位置。</p>
 <p>那让我们来看一下CGRect的定义：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*Points. */</span></div><div class="line"> </div><div class="line"><span class="keyword">struct</span></div><div class="line"> <span class="built_in">CGPoint</span> &#123;</div><div class="line">  <span class="built_in">CGFloat</span></div><div class="line"> x;</div><div class="line">  <span class="built_in">CGFloat</span></div><div class="line"> y;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">typedef</span></div><div class="line"> <span class="keyword">struct</span> <span class="built_in">CGPoint</span> <span class="built_in">CGPoint</span>;</div><div class="line"> </div><div class="line"><span class="comment">/*Sizes. */</span></div><div class="line"> </div><div class="line"><span class="keyword">struct</span></div><div class="line"> <span class="built_in">CGSize</span> &#123;</div><div class="line">  <span class="built_in">CGFloat</span></div><div class="line"> width;</div><div class="line">  <span class="built_in">CGFloat</span></div><div class="line"> height;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">typedef</span></div><div class="line"> <span class="keyword">struct</span> <span class="built_in">CGSize</span> <span class="built_in">CGSize</span>;</div><div class="line"> </div><div class="line"><span class="comment">/*Rectangles. */</span></div><div class="line"> </div><div class="line"><span class="keyword">struct</span></div><div class="line"> <span class="built_in">CGRect</span> &#123;</div><div class="line">  <span class="built_in">CGPoint</span></div><div class="line"> origin;</div><div class="line">  <span class="built_in">CGSize</span></div><div class="line"> size;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">typedef</span></div><div class="line"> <span class="keyword">struct</span> <span class="built_in">CGRect</span> <span class="built_in">CGRect</span>;</div></pre></td></tr></table></figure></p>
 <p>我们发现其实一个CGRect中包含了一个原点（point）和一组宽高的信（size）。其实一个CGRect就是描述了一个长方形的块，就像下图的红色方块一样的东西，我们的每一个View在坐标系中都会被表示为一个长方形的块状物。<br>比如我们有一个位置为((0,0)(100,100))的View：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">UIView</span>* aView = [<span class="built_in">UIView</span> new];</div><div class="line">aView.frame = <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span> , <span class="number">100</span> ,<span class="number">100</span>)</div></pre></td></tr></table></figure></p>
-<p>在它的父类的坐标系中展示如下图：<br> <div align="center"><img src="http://jbcdn2.b0.upaiyun.com/2014/03/4a925d337d1b73ce992333a9015348ee.png" alt=""></div><br>我们能够发现红色的View的frame信息所描述的几何位置，其实是其在父View坐标系中的绝对位置。死死的写在那里的。所以像UIKit这样的布局模型又叫绝对布局模型，如果你用过jave的Swing或者c++的QT，你可能会觉得这种绝对布局模型好麻烦，好啰嗦。没有布局管理器的概念，什么都是绝对的。但是只能说各有各的好处把。QT之类的有布局管理器的开发复杂界面的确方便，但是像在iphone这样的手机设备上，机器屏幕有限、设备性能有限，用绝对布局模型还是比较合适。苹果在IOS5之后也引入了一些相对布局的东西（autolayout）正好这里有篇文章是说其性能的<a href="http://floriankugler.com/blog/2013/4/21/auto-layout-performance-on-ios" target="_blank" rel="external">Auto Layout Performance on iOS</a>。读过之后你能发现自动布局在复杂界面情况下的性能的确比较差的。所以像UIKit这种比较原始的绝对布局在性能上还是有优势的。<br>扯回来，通过上图我们能够发现，UIKit的坐标系是一个二维平面坐标系，以左上角为原点，x轴横向扩展，y轴纵向向下扩展。y轴的防线可能和我们以前上学的时候，学的坐标系有点不太一样。这个估计是考虑在ios屏幕上布局的时候我们一般都是从上往下布局，y轴向下方便我们布局吧。既然知道了UIKit的坐标系统是一个二维平面坐标系统，那么我们以前学的很多几何知识就能够在这个坐标系统中尽情使用了。这里知识点太多不一而足，也是埋个伏笔，知道我们在些TableView的时候会用到很多几何上的知识。<br>同时，你可以把整个UIKit的View布局系统看成一个递归的系统，一个view在父view中布局，父view又在其父view中布局，最后直到在UIWindow上布局。这样递归的布局开来，就能构建起我们看到的app的界面。</p>
+<p>在它的父类的坐标系中展示如下图：<br> <div align="center"><img src="http://omu22b4eh.bkt.clouddn.com/hexo-ScrollView.png" alt=""></div><br>我们能够发现红色的View的frame信息所描述的几何位置，其实是其在父View坐标系中的绝对位置。死死的写在那里的。所以像UIKit这样的布局模型又叫绝对布局模型，如果你用过jave的Swing或者c++的QT，你可能会觉得这种绝对布局模型好麻烦，好啰嗦。没有布局管理器的概念，什么都是绝对的。但是只能说各有各的好处把。QT之类的有布局管理器的开发复杂界面的确方便，但是像在iphone这样的手机设备上，机器屏幕有限、设备性能有限，用绝对布局模型还是比较合适。苹果在IOS5之后也引入了一些相对布局的东西（autolayout）正好这里有篇文章是说其性能的<a href="http://floriankugler.com/blog/2013/4/21/auto-layout-performance-on-ios" target="_blank" rel="external">Auto Layout Performance on iOS</a>。读过之后你能发现自动布局在复杂界面情况下的性能的确比较差的。所以像UIKit这种比较原始的绝对布局在性能上还是有优势的。<br>扯回来，通过上图我们能够发现，UIKit的坐标系是一个二维平面坐标系，以左上角为原点，x轴横向扩展，y轴纵向向下扩展。y轴的防线可能和我们以前上学的时候，学的坐标系有点不太一样。这个估计是考虑在ios屏幕上布局的时候我们一般都是从上往下布局，y轴向下方便我们布局吧。既然知道了UIKit的坐标系统是一个二维平面坐标系统，那么我们以前学的很多几何知识就能够在这个坐标系统中尽情使用了。这里知识点太多不一而足，也是埋个伏笔，知道我们在些TableView的时候会用到很多几何上的知识。<br>同时，你可以把整个UIKit的View布局系统看成一个递归的系统，一个view在父view中布局，父view又在其父view中布局，最后直到在UIWindow上布局。这样递归的布局开来，就能构建起我们看到的app的界面。</p>
 <h2 id="UIView相关函数"><a href="#UIView相关函数" class="headerlink" title="UIView相关函数"></a>UIView相关函数</h2><h3 id="通用的一些函数"><a href="#通用的一些函数" class="headerlink" title="通用的一些函数"></a>通用的一些函数</h3><h4 id="初始化函数-id-initWithFrame-CGRect-aRect"><a href="#初始化函数-id-initWithFrame-CGRect-aRect" class="headerlink" title="初始化函数?- (id)initWithFrame:(CGRect)aRect"></a>初始化函数?- (id)initWithFrame:(CGRect)aRect</h4><p>   objc构建一个对象使用的是两段式，首先分配内存alloc然后init，这样的好处就是将内存操作和初始化操作解耦合，让我们能够在初始化的时候对对象做一些必要的操作。这是个很好的思路，我们在做很多事情的时候都可以使用这种两段式的思路。比如布局一个UIView，我们可以分成两部，初始化必要的子view和变量，然后在合适的时机进行布局。<br>   而这个两段式的第一步就是：<br>   <figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">id</span>)initWithFrame:(<span class="built_in">CGRect</span>)aRect</div></pre></td></tr></table></figure></p>
 <p>   这个函数是无论你用什么初始化函数都会被调用的一个，比如你用[UIView new]或者[[UIView alloc] init]都会调用initWithFrame这个函数（有些UIView的子类有特殊情况，比如UITableViewCell，怀疑apple对其做过特殊处理），所以你要是对一个view的变量有初始化的操作尽量往initWithFrame里面放还是非常合适的。 这样能够保证，以后在使用的时候所有的变量都被正确的初始化过。而我们一般会在initWithFrame中做些什么呢？</p>
 <p>   1.添加子View<br>   2.初始化属性变量<br>   3.其他一些共用操作</p>
@@ -402,6 +402,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/15/手动实现UITableView（二）/" rel="prev" title="手动实现UITableView（二）">
+                手动实现UITableView（二） <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -473,7 +477,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
