@@ -1,0 +1,762 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,动画," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="图层的树状结构Core Animation 是一个复合引擎，它的职责就是尽可能快地子和屏幕上的不同的可视内容，这个内容被分解为独立的图层，存储在一个叫做图层树的体系之中，而这个图层树形成了 UIKit 以及在 iOS 应用程序中你在屏幕上看到的一切的基础。
+图层和视图做 iOS 开发的都知道，一个图层就是屏幕上显示的一个矩形块，能够链接用户的交互操作。它在层级关系中可以互相嵌套，父视图可以管理它所">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS 核心动画（一）">
+<meta property="og:url" content="http://yoursite.com/2017/03/20/iOS-核心动画（一）/index.html">
+<meta property="og:site_name" content="舟'Blog">
+<meta property="og:description" content="图层的树状结构Core Animation 是一个复合引擎，它的职责就是尽可能快地子和屏幕上的不同的可视内容，这个内容被分解为独立的图层，存储在一个叫做图层树的体系之中，而这个图层树形成了 UIKit 以及在 iOS 应用程序中你在屏幕上看到的一切的基础。
+图层和视图做 iOS 开发的都知道，一个图层就是屏幕上显示的一个矩形块，能够链接用户的交互操作。它在层级关系中可以互相嵌套，父视图可以管理它所">
+<meta property="og:image" content="http://omu22b4eh.bkt.clouddn.com/book_core_animation_2_screen_1.jpeg?imageView2/0/w/400">
+<meta property="og:image" content="http://omu22b4eh.bkt.clouddn.com/book_core_animation_2_2.jpeg?imageView2/0/w/400">
+<meta property="og:image" content="http://omu22b4eh.bkt.clouddn.com/book_core_animation_3_1.jpeg?imageView2/0/w/400">
+<meta property="og:updated_time" content="2017-03-22T07:51:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS 核心动画（一）">
+<meta name="twitter:description" content="图层的树状结构Core Animation 是一个复合引擎，它的职责就是尽可能快地子和屏幕上的不同的可视内容，这个内容被分解为独立的图层，存储在一个叫做图层树的体系之中，而这个图层树形成了 UIKit 以及在 iOS 应用程序中你在屏幕上看到的一切的基础。
+图层和视图做 iOS 开发的都知道，一个图层就是屏幕上显示的一个矩形块，能够链接用户的交互操作。它在层级关系中可以互相嵌套，父视图可以管理它所">
+<meta name="twitter:image" content="http://omu22b4eh.bkt.clouddn.com/book_core_animation_2_screen_1.jpeg?imageView2/0/w/400">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/20/iOS-核心动画（一）/"/>
+
+
+
+
+
+  <title> iOS 核心动画（一） | 舟'Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">舟'Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">欢迎来到我的博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/20/iOS-核心动画（一）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="舟">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="舟'Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                iOS 核心动画（一）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-20T20:25:20+08:00">
+                2017-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="图层的树状结构"><a href="#图层的树状结构" class="headerlink" title="图层的树状结构"></a>图层的树状结构</h1><p>Core Animation 是一个复合引擎，它的职责就是尽可能快地子和屏幕上的不同的可视内容，这个内容被分解为独立的图层，存储在一个叫做<font size="3"><strong><em>图层树</em></strong></font>的体系之中，而这个图层树形成了 UIKit 以及在 iOS 应用程序中你在屏幕上看到的一切的基础。</p>
+<h2 id="图层和视图"><a href="#图层和视图" class="headerlink" title="图层和视图"></a>图层和视图</h2><p>做 iOS 开发的都知道，一个图层就是屏幕上显示的一个矩形块，能够链接用户的交互操作。它在层级关系中可以互相嵌套，父视图可以管理它所有子视图的位置。</p>
+<p>所有的视图都是从 UIView 上继承而来，UIview 可以处理触摸事件，可以支持基于 Core Graphics 绘图，可以做仿射变换（例如旋转或者缩放），或者简单的类似滑动或者渐变的动画。</p>
+<h3 id="CALayer"><a href="#CALayer" class="headerlink" title="CALayer"></a>CALayer</h3><p>做过动画相关的都知道 CALayer 这个类，它与 UIView 一样是被层级关系树管理的矩形块，也可以包含内容，与 UIView 最大的不同是由于它<strong>不清楚具体的响应链，所以不能响应事件从而处理用户的交互</strong>。</p>
+<h3 id="平行的层级关系"><a href="#平行的层级关系" class="headerlink" title="平行的层级关系"></a>平行的层级关系</h3><p>每一个 UIView 都有一个 CALayer 实例的图层属性，视图的职责就是创建并管理这个图层，以确保当子视图在层级关系中添加或者被移除的时候，他们关联的图层也同样对应在层级关系树当中有相同的操作。</p>
+<p>实际上这些背后关联的图层才是真正用来在屏幕上显示和做动画，UIView仅仅是对它的一个封装，提供了一些iOS类似于处理触摸的具体功能，以及Core Animation底层方法的高级接口。</p>
+<p>但是为什么iOS要基于UIView和CALayer提供两个平行的层级关系呢？为什么不用一个简单的层级来处理所有事情呢？原因在于要做职责分离，这样也能避免很多重复代码。在iOS和Mac OS两个平台上，事件和用户交互有很多地方的不同，基于多点触控的用户界面和基于鼠标键盘有着本质的区别，这就是为什么iOS有UIKit和UIView，但是Mac OS有AppKit和NSView的原因。他们功能上很相似，但是在实现上有着显著的区别。</p>
+<p>绘图，布局和动画，相比之下就是类似Mac笔记本和桌面系列一样应用于iPhone和iPad触屏的概念。把这种功能的逻辑分开并应用到独立的Core Animation框架，苹果就能够在iOS和Mac OS之间共享代码，使得对苹果自己的OS开发团队和第三方开发者去开发两个平台的应用更加便捷。</p>
+<p>实际上，这里并不是两个层级关系，而是四个，每一个都扮演不同的角色，除了视图层级和图层树之外，还存在呈现树和渲染树。</p>
+<h2 id="图层的能力"><a href="#图层的能力" class="headerlink" title="图层的能力"></a>图层的能力</h2><p>我们已经知道了 CALayer 是 UIView 的内部实现细节，在通常状况下，我们使用苹果提供的 UIView 高级 API 就能是动画变得简单，但这种简单是建立在牺牲一定灵活性的基础上的，如果想实现一些特定的动画效果，我们就必须了解 Core Animation 的底层。</p>
+<p>我们已经知道了 Layer 是无法处理触摸事件的，那么他能做哪些 View 不能做的事情呢？</p>
+<ul>
+<li>阴影，圆角，带颜色的边框</li>
+<li>3D 变换</li>
+<li>非矩形范围</li>
+<li>透明遮罩</li>
+<li>多级非线性动画</li>
+</ul>
+<h2 id="使用图层"><a href="#使用图层" class="headerlink" title="使用图层"></a>使用图层</h2><p>要使用 Layer 首先我们要在项目里引入<quartzcore quartzcore.h="">库。</quartzcore></p>
+<p>接着向视图上加入图层：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#import <span class="meta-string">"ViewController.h"</span></span></div><div class="line"><span class="meta">#import <span class="meta-string">&lt;QuartzCore/QuartzCore.h&gt;</span></span></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">weak</span>) <span class="keyword">IBOutlet</span> <span class="built_in">UIView</span> *layerView;</div><div class="line">￼</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)viewDidLoad</div><div class="line">&#123;</div><div class="line">    [<span class="keyword">super</span> viewDidLoad];</div><div class="line">    <span class="comment">//create sublayer</span></div><div class="line">    <span class="built_in">CALayer</span> *blueLayer = [<span class="built_in">CALayer</span> layer];</div><div class="line">    blueLayer.frame = <span class="built_in">CGRectMake</span>(<span class="number">50.0</span>f, <span class="number">50.0</span>f, <span class="number">100.0</span>f, <span class="number">100.0</span>f);</div><div class="line">    blueLayer.backgroundColor = [<span class="built_in">UIColor</span> blueColor].CGColor;</div><div class="line">    <span class="comment">//add it to our view</span></div><div class="line">    [<span class="keyword">self</span>.layerView.layer addSublayer:blueLayer];</div><div class="line">&#125;</div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<hr>
+<h1 id="寄宿图"><a href="#寄宿图" class="headerlink" title="寄宿图"></a>寄宿图</h1><h2 id="contents属性"><a href="#contents属性" class="headerlink" title="contents属性"></a>contents属性</h2><p>CALayer 有一个属性叫 contents，它被定义为 id 类型，意味着它可以是任何类型的对象。在这种情况下，你可以给contents属性赋任何值，你的app仍然能够编译通过。但是，在实践中，如果你给contents赋的不是CGImage，那么你得到的图层将是空白的。</p>
+<p>contents这个奇怪的表现是由Mac OS的历史原因造成的。它之所以被定义为id类型，是因为在Mac OS系统上，这个属性对CGImage和NSImage类型的值都起作用。如果你试图在iOS平台上将UIImage的值赋给它，只能得到一个空白的图层。一些初识Core Animation的iOS开发者可能会对这个感到困惑。</p>
+<p>头疼的不仅仅是我们刚才提到的这个问题。事实上，你真正要赋值的类型应该是CGImageRef，它是一个指向CGImage结构的指针。UIImage有一个CGImage属性，它返回一个”CGImageRef”,如果你想把这个值直接赋值给CALayer的contents，那你将会得到一个编译错误。因为CGImageRef并不是一个真正的Cocoa对象，而是一个Core Foundation类型。</p>
+<p>尽管Core Foundation类型跟Cocoa对象在运行时貌似很像（被称作toll-free bridging），它们并不是类型兼容的，不过你可以通过bridged关键字转换。如果要给图层的寄宿图赋值，你可以按照以下这个方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">layer.contents = (__bridge <span class="keyword">id</span>)image.CGImage;</div></pre></td></tr></table></figure>
+<p>如果你没有使用ARC（自动引用计数），你就不需要__bridge这部分。但是，你干嘛不用ARC？！</p>
+<p>让我们来继续修改我们在第一章新建的工程，以便能够展示一张图片而不仅仅是一个背景色。我们已经用代码的方式建立一个图层，那我们就不需要额外的图层了。那么我们就直接把layerView的宿主图层的contents属性设置成图片。</p>
+ <div align="center"><img src="http://omu22b4eh.bkt.clouddn.com/book_core_animation_2_screen_1.jpeg?imageView2/0/w/400" alt=""></div>
+
+<p>如上图，我们用上面的代码在一个 CALayer 上显示了一张图片。</p>
+<h2 id="contentGravity"><a href="#contentGravity" class="headerlink" title="contentGravity"></a>contentGravity</h2><p>上图中由于我们是使用的是方形图片，所以填充了整个 Layer，但在日常情况中，很少有这样的图片，那应该怎么做呢？我们都知道 UIImageView 有 contentMode 属性，平常我们操作的时候都是这样：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">view.contentMode = <span class="built_in">UIViewContentModeScaleAspectFit</span>;</div></pre></td></tr></table></figure>
+<p>CALayer与contentMode对应的属性叫做contentsGravity，但是它是一个NSString类型，而不是像对应的UIKit部分，那里面的值是枚举。contentsGravity可选的常量值有以下一些：</p>
+<ul>
+<li>kCAGravityCenter</li>
+<li>kCAGravityTop</li>
+<li>kCAGravityBottom</li>
+<li>kCAGravityLeft</li>
+<li>kCAGravityRight</li>
+<li>kCAGravityTopLeft</li>
+<li>kCAGravityTopRight</li>
+<li>kCAGravityBottomLeft</li>
+<li>kCAGravityBottomRight</li>
+<li>kCAGravityResize</li>
+<li>kCAGravityResizeAspect</li>
+<li>kCAGravityResizeAspectFill</li>
+</ul>
+<h2 id="contentScale"><a href="#contentScale" class="headerlink" title="contentScale"></a>contentScale</h2><p>contentsScale属性定义了寄宿图的像素尺寸和视图大小的比例，默认情况下它是一个值为1.0的浮点数。</p>
+<p>contentsScale属性其实属于支持高分辨率（又称Hi-DPI或Retina）屏幕机制的一部分。它用来判断在绘制图层的时候应该为寄宿图创建的空间大小，和需要显示的图片的拉伸度（假设并没有设置contentsGravity属性）。UIView有一个类似功能但是非常少用到的contentScaleFactor属性。</p>
+<p>如果contentsScale设置为1.0，将会以每个点1个像素绘制图片，如果设置为2.0，则会以每个点2个像素绘制图片，这就是我们熟知的Retina屏幕。</p>
+<p>当用代码的方式来处理寄宿图的时候，一定要记住要手动的设置图层的contentsScale属性，否则，你的图片在Retina设备上就显示得不正确啦。代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">layer.contentsScale = [<span class="built_in">UIScreen</span> mainScreen].scale;</div></pre></td></tr></table></figure>
+<h2 id="maskToBounds"><a href="#maskToBounds" class="headerlink" title="maskToBounds"></a>maskToBounds</h2><p>UIView有一个叫做clipsToBounds的属性可以用来决定是否显示超出边界的内容，CALayer对应的属性叫做masksToBounds。</p>
+<h2 id="contentRect"><a href="#contentRect" class="headerlink" title="contentRect"></a>contentRect</h2><p>CALayer的contentsRect属性允许我们在图层边框里显示寄宿图的一个子域。这涉及到图片是如何显示和拉伸的，所以要比contentsGravity灵活多了，和bounds，frame不同，contentsRect不是按点来计算的，它使用了单位坐标，单位坐标指定在0到1之间，是一个相对值（像素和点就是绝对值）。所以它们是相对与寄宿图的尺寸的。</p>
+<p>默认的contentsRect是{0, 0, 1, 1}，这意味着整个寄宿图默认都是可见的，如果我们指定一个小一点的矩形，图片就会被裁剪。</p>
+ <div align="center"><img src="http://omu22b4eh.bkt.clouddn.com/book_core_animation_2_2.jpeg?imageView2/0/w/400" alt=""></div>
+
+<p>设置 contentRect 为{0,0,0.5,0.5}后这张图片相对于上面的图片，只显示了部分。</p>
+<p>contentsRect在app中最有趣的地方在于一个叫做image sprites（图片拼合）的用法。如果你有游戏编程的经验，那么你一定对图片拼合的概念很熟悉，图片能够在屏幕上独立地变更位置。抛开游戏编程不谈，这个技术常用来指代载入拼合的图片，跟移动图片一点关系也没有。</p>
+<p>典型地，图片拼合后可以打包整合到一张大图上一次性载入。相比多次载入不同的图片，这样做能够带来很多方面的好处：内存使用，载入时间，渲染性能等等。</p>
+<p>2D游戏引擎入Cocos2D使用了拼合技术，它使用OpenGL来显示图片。不过我们可以使用拼合在一个普通的UIKit应用中，对！就是使用contentsRect。</p>
+<h2 id="contentsCenter"><a href="#contentsCenter" class="headerlink" title="contentsCenter"></a>contentsCenter</h2><p>看到这个属性你可能认为它与图片位置有关，其实它是一个 CGRect，定义了一个固定的边框和一个图层上克拉神的区域。 改变contentsCenter的值并不会影响到寄宿图的显示，除非这个图层的大小改变了，你才看得到效果。</p>
+<p>默认情况下，contentsCenter是{0, 0, 1, 1}，这意味着如果大小（由conttensGravity决定）改变了,那么寄宿图将会均匀地拉伸开。但是如果我们增加原点的值并减小尺寸。我们会在图片的周围创造一个边框。这意味着我们可以随意重设尺寸，边框仍然会是连续的。它工作起来的效果和UIImage里的-resizableImageWithCapInsets: 方法效果非常类似，只是它可以运用到任何寄宿图，甚至包括在Core Graphics运行时绘制的图形（本章稍后会讲到）。</p>
+<h2 id="Custome-Drawing"><a href="#Custome-Drawing" class="headerlink" title="Custome Drawing"></a>Custome Drawing</h2><p>给contents赋CGImage的值不是唯一的设置寄宿图的方法。我们也可以直接用Core Graphics直接绘制寄宿图。能够通过继承UIView并实现-drawRect:方法来自定义绘制。</p>
+<p>-drawRect: 方法没有默认的实现，因为对UIView来说，寄宿图并不是必须的，它不在意那到底是单调的颜色还是有一个图片的实例。如果UIView检测到-drawRect: 方法被调用了，它就会为视图分配一个寄宿图，这个寄宿图的像素尺寸等于视图大小乘以 contentsScale的值。</p>
+<p>如果你不需要寄宿图，那就不要创建这个方法了，这会造成CPU资源和内存的浪费，这也是为什么苹果建议：如果没有自定义绘制的任务就不要在子类中写一个空的-drawRect:方法。</p>
+<p>当视图在屏幕上出现的时候 -drawRect:方法就会被自动调用。-drawRect:方法里面的代码利用Core Graphics去绘制一个寄宿图，然后内容就会被缓存起来直到它需要被更新（通常是因为开发者调用了-setNeedsDisplay方法，尽管影响到表现效果的属性值被更改时，一些视图类型会被自动重绘，如bounds属性）。虽然-drawRect:方法是一个UIView方法，事实上都是底层的CALayer安排了重绘工作和保存了因此产生的图片。</p>
+<p>CALayer有一个可选的delegate属性，实现了CALayerDelegate协议，当CALayer需要一个内容特定的信息时，就会从协议中请求。CALayerDelegate是一个非正式协议，其实就是说没有CALayerDelegate @protocol可以让你在类里面引用啦。你只需要调用你想调用的方法，CALayer会帮你做剩下的。（delegate属性被声明为id类型，所有的代理方法都是可选的）。</p>
+<p>当需要被重绘时，CALayer会请求它的代理给它一个寄宿图来显示。它通过调用下面这个方法做到的:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(<span class="keyword">void</span>)displayLayer:(<span class="built_in">CALayer</span> *)layer;</div></pre></td></tr></table></figure>
+<p>趁着这个机会，如果代理想直接设置contents属性的话，它就可以这么做，不然没有别的方法可以调用了。如果代理不实现-displayLayer:方法，CALayer就会转而尝试调用下面这个方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)drawLayer:(<span class="built_in">CALayer</span> *)layer inContext:(<span class="built_in">CGContextRef</span>)ctx;</div></pre></td></tr></table></figure>
+<p>在调用这个方法之前，CALayer创建了一个合适尺寸的空寄宿图（尺寸由bounds和contentsScale决定）和一个Core Graphics的绘制上下文环境，为绘制寄宿图做准备，它作为ctx参数传入。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></div><div class="line">- (<span class="keyword">void</span>)viewDidLoad</div><div class="line">&#123;</div><div class="line">  [<span class="keyword">super</span> viewDidLoad];</div><div class="line">  ￼</div><div class="line">  <span class="comment">//create sublayer</span></div><div class="line">  <span class="built_in">CALayer</span> *blueLayer = [<span class="built_in">CALayer</span> layer];</div><div class="line">  blueLayer.frame = <span class="built_in">CGRectMake</span>(<span class="number">50.0</span>f, <span class="number">50.0</span>f, <span class="number">100.0</span>f, <span class="number">100.0</span>f);</div><div class="line">  blueLayer.backgroundColor = [<span class="built_in">UIColor</span> blueColor].CGColor;</div><div class="line"></div><div class="line">  <span class="comment">//set controller as layer delegate</span></div><div class="line">  blueLayer.delegate = <span class="keyword">self</span>;</div><div class="line"></div><div class="line">  <span class="comment">//ensure that layer backing image uses correct scale</span></div><div class="line">  blueLayer.contentsScale = [<span class="built_in">UIScreen</span> mainScreen].scale; <span class="comment">//add layer to our view</span></div><div class="line">  [<span class="keyword">self</span>.layerView.layer addSublayer:blueLayer];</div><div class="line"></div><div class="line">  <span class="comment">//force layer to redraw</span></div><div class="line">  [blueLayer display];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)drawLayer:(<span class="built_in">CALayer</span> *)layer inContext:(<span class="built_in">CGContextRef</span>)ctx</div><div class="line">&#123;</div><div class="line">  <span class="comment">//draw a thick red circle</span></div><div class="line">  <span class="built_in">CGContextSetLineWidth</span>(ctx, <span class="number">10.0</span>f); </div><div class="line">  <span class="built_in">CGContextSetStrokeColorWithColor</span>(ctx, [<span class="built_in">UIColor</span> redColor].CGColor);</div><div class="line">  <span class="built_in">CGContextStrokeEllipseInRect</span>(ctx, layer.bounds);</div><div class="line">&#125;</div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<p>实现的效果</p>
+ <div align="center"><img src="http://omu22b4eh.bkt.clouddn.com/book_core_animation_3_1.jpeg?imageView2/0/w/400" alt=""></div>
+
+
+
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/动画/" rel="tag"># 动画</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/20/《图解HTTP》笔记（三）/" rel="next" title="《图解HTTP》笔记（三）">
+                <i class="fa fa-chevron-left"></i> 《图解HTTP》笔记（三）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="舟" />
+          <p class="site-author-name" itemprop="name">舟</p>
+           
+              <p class="site-description motion-element" itemprop="description">舟的博客</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://manjusaka.itscoder.com/" title="Manjusaka的博客" target="_blank">Manjusaka的博客</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#图层的树状结构"><span class="nav-number">1.</span> <span class="nav-text">图层的树状结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#图层和视图"><span class="nav-number">1.1.</span> <span class="nav-text">图层和视图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CALayer"><span class="nav-number">1.1.1.</span> <span class="nav-text">CALayer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#平行的层级关系"><span class="nav-number">1.1.2.</span> <span class="nav-text">平行的层级关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图层的能力"><span class="nav-number">1.2.</span> <span class="nav-text">图层的能力</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用图层"><span class="nav-number">1.3.</span> <span class="nav-text">使用图层</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#寄宿图"><span class="nav-number">2.</span> <span class="nav-text">寄宿图</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#contents属性"><span class="nav-number">2.1.</span> <span class="nav-text">contents属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#contentGravity"><span class="nav-number">2.2.</span> <span class="nav-text">contentGravity</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#contentScale"><span class="nav-number">2.3.</span> <span class="nav-text">contentScale</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#maskToBounds"><span class="nav-number">2.4.</span> <span class="nav-text">maskToBounds</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#contentRect"><span class="nav-number">2.5.</span> <span class="nav-text">contentRect</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#contentsCenter"><span class="nav-number">2.6.</span> <span class="nav-text">contentsCenter</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Custome-Drawing"><span class="nav-number">2.7.</span> <span class="nav-text">Custome Drawing</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">舟</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>
