@@ -97,7 +97,7 @@
 <meta property="og:description" content="关于 blockblock 是 Apple 在 OSX Snow Leopard 和 iOS4中引入的新功能，是 C 语言的扩展，在许多语言里面都有这个功能，一般称为闭包。简而言之，block 就是带有自动变量（局部变量）的匿名函数。
 在 OC 中的实现如下：
 123456789101112131415struct Block_layout &amp;#123;    void *isa;    int">
-<meta property="og:updated_time" content="2017-08-31T09:35:28.000Z">
+<meta property="og:updated_time" content="2017-08-31T09:40:39.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="block 研究">
 <meta name="twitter:description" content="关于 blockblock 是 Apple 在 OSX Snow Leopard 和 iOS4中引入的新功能，是 C 语言的扩展，在许多语言里面都有这个功能，一般称为闭包。简而言之，block 就是带有自动变量（局部变量）的匿名函数。
@@ -396,7 +396,7 @@
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;__NSGlobalBlock__: <span class="number">0x100001050</span>&gt;</div><div class="line">Block中 变量 = <span class="number">2</span> <span class="number">3</span> <span class="number">1</span></div></pre></td></tr></table></figure>
 <p>可见，只用到全局变量、静态变量的block也可以是_NSConcreteGlobalBlock。</p>
 <p>所以在ARC环境下，3种类型都可以捕获外部变量。</p>
-<h2 id="从持有对象的角度上来看"><a href="#从持有对象的角度上来看" class="headerlink" title="从持有对象的角度上来看"></a>从持有对象的角度上来看</h2><ul>
+<h3 id="从持有对象的角度上来看"><a href="#从持有对象的角度上来看" class="headerlink" title="从持有对象的角度上来看"></a>从持有对象的角度上来看</h3><ul>
 <li>_NSConcreteStackBlock是不持有对象的。</li>
 </ul>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//以下是在MRC下执行的</span></div><div class="line">    <span class="built_in">NSObject</span> * obj = [[<span class="built_in">NSObject</span> alloc]init];</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"1.Block外 obj = %lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)obj.retainCount);</div><div class="line"></div><div class="line">    <span class="keyword">void</span> (^myBlock)(<span class="keyword">void</span>) = ^&#123;</div><div class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Block中 obj = %lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)obj.retainCount);</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"2.Block外 obj = %lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)obj.retainCount);</div><div class="line"></div><div class="line">    myBlock();</div></pre></td></tr></table></figure>
@@ -511,6 +511,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2017/08/31/block-研究/" rel="prev" title="block 研究">
+                block 研究 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -581,7 +585,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -643,7 +647,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关于-block"><span class="nav-number">1.</span> <span class="nav-text">关于 block</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#block捕获外部变量的实质"><span class="nav-number">1.1.</span> <span class="nav-text">block捕获外部变量的实质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#block-的-copy-和-dispose"><span class="nav-number">1.2.</span> <span class="nav-text">block 的 copy 和 dispose</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从捕获外部变量的角度上来看"><span class="nav-number">1.2.1.</span> <span class="nav-text">从捕获外部变量的角度上来看</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从持有对象的角度上来看"><span class="nav-number">1.3.</span> <span class="nav-text">从持有对象的角度上来看</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Block中-block实现原理"><span class="nav-number">1.4.</span> <span class="nav-text">Block中__block实现原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最后"><span class="nav-number">1.5.</span> <span class="nav-text">最后</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关于-block"><span class="nav-number">1.</span> <span class="nav-text">关于 block</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#block捕获外部变量的实质"><span class="nav-number">1.1.</span> <span class="nav-text">block捕获外部变量的实质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#block-的-copy-和-dispose"><span class="nav-number">1.2.</span> <span class="nav-text">block 的 copy 和 dispose</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从捕获外部变量的角度上来看"><span class="nav-number">1.2.1.</span> <span class="nav-text">从捕获外部变量的角度上来看</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从持有对象的角度上来看"><span class="nav-number">1.2.2.</span> <span class="nav-text">从持有对象的角度上来看</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Block中-block实现原理"><span class="nav-number">1.3.</span> <span class="nav-text">Block中__block实现原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最后"><span class="nav-number">1.4.</span> <span class="nav-text">最后</span></a></li></ol></li></ol></div>
             
 
           </div>
