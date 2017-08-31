@@ -1,0 +1,748 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,进阶," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="简介RunTime 又叫运行时，是一套底层的 C 语言 API，是 iOS 内部的核心之一，我们平时编写的 OC 代码，底层都是基于它来实现的。比如：
+1234567[receiver message];// 底层运行时会被编译器转化为：objc_msgSend(receiver, selector)// 如果其还有参数比如：[receiver message:(id)arg...];// 底层运">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RunTime理解">
+<meta property="og:url" content="http://yoursite.com/2017/03/27/RunTime理解/index.html">
+<meta property="og:site_name" content="舟'Blog">
+<meta property="og:description" content="简介RunTime 又叫运行时，是一套底层的 C 语言 API，是 iOS 内部的核心之一，我们平时编写的 OC 代码，底层都是基于它来实现的。比如：
+1234567[receiver message];// 底层运行时会被编译器转化为：objc_msgSend(receiver, selector)// 如果其还有参数比如：[receiver message:(id)arg...];// 底层运">
+<meta property="og:updated_time" content="2017-03-28T06:49:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RunTime理解">
+<meta name="twitter:description" content="简介RunTime 又叫运行时，是一套底层的 C 语言 API，是 iOS 内部的核心之一，我们平时编写的 OC 代码，底层都是基于它来实现的。比如：
+1234567[receiver message];// 底层运行时会被编译器转化为：objc_msgSend(receiver, selector)// 如果其还有参数比如：[receiver message:(id)arg...];// 底层运">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/27/RunTime理解/"/>
+
+
+
+
+
+  <title> RunTime理解 | 舟'Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">舟'Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">欢迎来到我的博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/27/RunTime理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="舟">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="舟'Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                RunTime理解
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-27T17:10:12+08:00">
+                2017-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>RunTime 又叫运行时，是一套底层的 C 语言 API，是 iOS 内部的核心之一，我们平时编写的 OC 代码，底层都是基于它来实现的。比如：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[receiver message];</div><div class="line"><span class="comment">// 底层运行时会被编译器转化为：</span></div><div class="line">objc_msgSend(receiver, selector)</div><div class="line"><span class="comment">// 如果其还有参数比如：</span></div><div class="line">[receiver message:(<span class="keyword">id</span>)arg...];</div><div class="line"><span class="comment">// 底层运行时会被编译器转化为：</span></div><div class="line">objc_msgSend(receiver, selector, arg1, arg2, ...)</div></pre></td></tr></table></figure>
+<p>我们都知道 Objective-C 是一门动态语言，它会将一些工作放在代码运行时才处理而并非编译时。也就是说，有很多类和成员变量在我们编译的时是不知道的，而在运行时，我们所编写的代码会转换成完整的确定的代码运行。因此，编译器是不够的，我们还需要一个运行时系统(Runtime system)来处理编译后的代码。</p>
+<hr>
+<h1 id="RunTime-的作用"><a href="#RunTime-的作用" class="headerlink" title="RunTime 的作用"></a>RunTime 的作用</h1><p>Objc在三种层面上与 Runtime 系统进行交互：</p>
+<ol>
+<li>通过 Objective-C 源代码</li>
+<li>通过 Foundation 框架的 NSObject 类定义的方法</li>
+<li>通过对 Runtime 库函数的直接调用</li>
+</ol>
+<h2 id="Objective-C-源代码"><a href="#Objective-C-源代码" class="headerlink" title="Objective-C 源代码"></a>Objective-C 源代码</h2><p>多数情况我们只需要编写 OC 代码即可，Runtime 系统自动在幕后搞定一切，还记得简介中如果我们调用方法，编译器会将 OC 代码转换成运行时代码，在运行时确定数据结构和函数。</p>
+<h2 id="通过-Foundation-框架的-NSObject-类定义的方法"><a href="#通过-Foundation-框架的-NSObject-类定义的方法" class="headerlink" title="通过 Foundation 框架的 NSObject 类定义的方法"></a>通过 Foundation 框架的 NSObject 类定义的方法</h2><p>Cocoa 程序中绝大部分类都是 NSObject 类的子类，所以都继承了 NSObject 的行为。(NSProxy 类时个例外，它是个抽象超类)</p>
+<p>一些情况下，NSObject 类仅仅定义了完成某件事情的模板，并没有提供所需要的代码。例如 -description 方法，该方法返回类内容的字符串表示，该方法主要用来调试程序。NSObject 类并不知道子类的内容，所以它只是返回类的名字和对象的地址，NSObject 的子类可以重新实现。</p>
+<p>还有一些 NSObject 的方法可以从 Runtime 系统中获取信息，允许对象进行自我检查。例如：</p>
+<ul>
+<li>-class方法返回对象的类</li>
+<li>-isKindOfClass: 和 -isMemberOfClass: 方法检查对象是否存在于指定的类的继承体系中(是否是其子类或者父类或者当前类的成员变量)</li>
+<li>-respondsToSelector: 检查对象能否响应指定的消息</li>
+<li>-conformsToProtocol:检查对象是否实现了指定协议类的方法</li>
+<li>-methodForSelector: 返回指定方法实现的地址</li>
+</ul>
+<h2 id="通过对-Runtime-库函数的直接调用"><a href="#通过对-Runtime-库函数的直接调用" class="headerlink" title="通过对 Runtime 库函数的直接调用"></a>通过对 Runtime 库函数的直接调用</h2><p>untime 系统是具有公共接口的动态共享库。头文件存放于/usr/include/objc目录下，这意味着我们使用时只需要引入objc/Runtime.h头文件即可。</p>
+<p>许多函数可以让你使用纯 C 代码来实现 Objc 中同样的功能。除非是写一些 Objc 与其他语言的桥接或是底层的 debug 工作，你在写 Objc 代码时一般不会用到这些 C 语言函数。</p>
+<hr>
+<h1 id="RunTime-的一些术语"><a href="#RunTime-的一些术语" class="headerlink" title="RunTime 的一些术语"></a>RunTime 的一些术语</h1><h2 id="SEL"><a href="#SEL" class="headerlink" title="SEL"></a>SEL</h2><p>它是 selector 在 Objc 中的表示（ Swift 中是 Selector 类）。selector 是方法选择器，与我们在日常生活中的名字一样用来分辨谁是谁，但是在 Objc 同一个类中不会有相同命名的两个方法。selector 对方法明进行包装，以便找到相应的方法实现，它的数据结构是：</p>
+<p><code>typedef struct objc_selector *SEL;</code></p>
+<p>我们可以看出它是一个映射到方法的 C 字符串，你可以通过 Objc 编译器命令@selector（）或者 RunTime 系统的 sel_registerName 函数来获取一个 SEL 类型的方法选择器。</p>
+<h2 id="id"><a href="#id" class="headerlink" title="id"></a>id</h2><p>id是一个参数类型，它是指向某个类的实例的指针。定义如下：</p>
+<p><code>typedef struct objc_object *id;</code><br><code>struct objc_object { Class isa; };</code></p>
+<p>以上定义，看到 objc_object 结构体包含一个 isa 指针，根据 isa 指针就可以找到对象所属的类。</p>
+<font color="red"><em>isa 指针在代码运行时并不总指向实例对象所属的类型，所以不能依靠它来确定类型，要想确定类型还是需要用对象的 -class 方法。</em></font>
+
+<h2 id="Class"><a href="#Class" class="headerlink" title="Class"></a>Class</h2><p><code>typedef struct objc_class *Class;</code></p>
+<p>Class 其实是指向 objc_class 结构体的指针。objc_class 的数据结构如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> objc_class &#123;</div><div class="line">    Class isa  OBJC_ISA_AVAILABILITY;</div><div class="line"></div><div class="line"><span class="meta">#if !__OBJC2__</span></div><div class="line">    Class super_class                                        OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name                                         OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">long</span> version                                             OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">long</span> info                                                OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">long</span> instance_size                                       OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">struct</span> objc_ivar_list *ivars                             OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">struct</span> objc_method_list **methodLists                    OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">struct</span> objc_cache *cache                                 OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">struct</span> objc_protocol_list *protocols                     OBJC2_UNAVAILABLE;</div><div class="line"><span class="meta">#endif</span></div><div class="line"></div><div class="line">&#125; OBJC2_UNAVAILABLE;</div></pre></td></tr></table></figure>
+<p>从 objc_class 可以看到，一个运行时类中关联了它的父类指针、类名、成员变量、方法、缓存以及附属的协议。</p>
+<p>其中 objc_ivar_list 和 objc_method_list 分别是成员变量列表和方法列表：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 成员变量列表</span></div><div class="line"><span class="keyword">struct</span> objc_ivar_list &#123;</div><div class="line">    <span class="keyword">int</span> ivar_count                                           OBJC2_UNAVAILABLE;</div><div class="line"><span class="meta">#ifdef __LP64__</span></div><div class="line">    <span class="keyword">int</span> space                                                OBJC2_UNAVAILABLE;</div><div class="line"><span class="meta">#endif</span></div><div class="line">    <span class="comment">/* variable length structure */</span></div><div class="line">    <span class="keyword">struct</span> objc_ivar ivar_list[<span class="number">1</span>]                            OBJC2_UNAVAILABLE;</div><div class="line">&#125;                                                            OBJC2_UNAVAILABLE;</div><div class="line"></div><div class="line"><span class="comment">// 方法列表</span></div><div class="line"><span class="keyword">struct</span> objc_method_list &#123;</div><div class="line">    <span class="keyword">struct</span> objc_method_list *obsolete                        OBJC2_UNAVAILABLE;</div><div class="line"></div><div class="line">    <span class="keyword">int</span> method_count                                         OBJC2_UNAVAILABLE;</div><div class="line"><span class="meta">#ifdef __LP64__</span></div><div class="line">    <span class="keyword">int</span> space                                                OBJC2_UNAVAILABLE;</div><div class="line"><span class="meta">#endif</span></div><div class="line">    <span class="comment">/* variable length structure */</span></div><div class="line">    <span class="keyword">struct</span> objc_method method_list[<span class="number">1</span>]                        OBJC2_UNAVAILABLE;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>由此可见，我们可以动态修改 *methodList 的值来添加成员方法，这也是 Category 实现的原理，同样解释了 Category 不能添加属性的原因。</p>
+<p>objc_ivar_list 结构体用来存储成员变量的列表，而 objc_ivar 则是存储了单个成员变量的信息；同理，objc_method_list 结构体存储着方法数组的列表，而单个方法的信息则由 objc_method 结构体存储。</p>
+<p>值得注意的时，objc_class 中也有一个 isa 指针，这说明 Objc 类本身也是一个对象。为了处理类和对象的关系，Runtime 库创建了一种叫做 Meta Class(元类) 的东西，类对象所属的类就叫做元类。Meta Class 表述了类对象本身所具备的元数据。</p>
+<p>我们所熟悉的类方法，就源自于 Meta Class。我们可以理解为类方法就是类对象的实例方法。每个类仅有一个类对象，而每个类对象仅有一个与之相关的元类。</p>
+<p>当你发出一个类似 [NSObject alloc](类方法) 的消息时，实际上，这个消息被发送给了一个类对象(Class Object)，这个类对象必须是一个元类的实例，而这个元类同时也是一个根元类(Root Meta Class)的实例。所有元类的 isa 指针最终都指向根元类。</p>
+<p>所以当 [NSObject alloc] 这条消息发送给类对象的时候，运行时代码 objc_msgSend() 会去它元类中查找能够响应消息的方法实现，如果找到了，就会对这个类对象执行方法调用。</p>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><p>Method 代表类中某个方法的类型</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> objc_method *Method;</div><div class="line"></div><div class="line"><span class="keyword">struct</span> objc_method &#123;</div><div class="line">    SEL method_name                                          OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">char</span> *method_types                                       OBJC2_UNAVAILABLE;</div><div class="line">    IMP method_imp                                           OBJC2_UNAVAILABLE;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>objc_method 存储了方法名，方法类型和方法实现：</p>
+<ul>
+<li>方法名类型为 SEL</li>
+<li>方法类型 method_types 是个 char 指针，存储方法的参数类型和返回值类型</li>
+<li>method_imp 指向了方法的实现，本质是一个函数指针</li>
+</ul>
+<h2 id="Ivar"><a href="#Ivar" class="headerlink" title="Ivar"></a>Ivar</h2><p>Ivar 是表示成员变量的类型</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> objc_ivar *Ivar;</div><div class="line"></div><div class="line"><span class="keyword">struct</span> objc_ivar &#123;</div><div class="line">    <span class="keyword">char</span> *ivar_name                                          OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">char</span> *ivar_type                                          OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">int</span> ivar_offset                                          OBJC2_UNAVAILABLE;</div><div class="line"><span class="meta">#ifdef __LP64__</span></div><div class="line">    <span class="keyword">int</span> space                                                OBJC2_UNAVAILABLE;</div><div class="line"><span class="meta">#endif</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中 ivar_offset 是基地址偏移字节</p>
+<h2 id="IMP"><a href="#IMP" class="headerlink" title="IMP"></a>IMP</h2><p>IMP在objc.h中的定义是：</p>
+<p><code>typedef id (*IMP)(id, SEL, ...);</code></p>
+<p>它就是一个函数指针，这是由编译器生成的。当你发起一个 ObjC 消息之后，最终它会执行的那段代码，就是由这个函数指针指定的。而 IMP 这个函数指针就指向了这个方法的实现。</p>
+<p>如果得到了执行某个实例某个方法的入口，我们就可以绕开消息传递阶段，直接执行方法，这在后面 Cache 中会提到。</p>
+<p>你会发现 IMP 指向的方法与 objc_msgSend 函数类型相同，参数都包含 id 和 SEL 类型。每个方法名都对应一个 SEL 类型的方法选择器，而每个实例对象中的 SEL 对应的方法实现肯定是唯一的，通过一组 id和 SEL 参数就能确定唯一的方法实现地址。</p>
+<p>而一个确定的方法也只有唯一的一组 id 和 SEL 参数。</p>
+<h2 id="Cache"><a href="#Cache" class="headerlink" title="Cache"></a>Cache</h2><p>Cache 定义如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> objc_cache *Cache</div><div class="line"></div><div class="line"><span class="keyword">struct</span> objc_cache &#123;</div><div class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> mask <span class="comment">/* total = mask + 1 */</span>                 OBJC2_UNAVAILABLE;</div><div class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> occupied                                    OBJC2_UNAVAILABLE;</div><div class="line">    Method buckets[<span class="number">1</span>]                                        OBJC2_UNAVAILABLE;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Cache 为方法调用的性能进行优化，每当实例对象接收到一个消息时，它不会直接在 isa 指针指向的类的方法列表中遍历查找能够响应的方法，因为每次都要查找效率太低了，而是优先在 Cache 中查找。</p>
+<p>Runtime 系统会把被调用的方法存到 Cache 中，如果一个方法被调用，那么它有可能今后还会被调用，下次查找的时候就会效率更高。就像计算机组成原理中 CPU 绕过主存先访问 Cache 一样。</p>
+<h2 id="Property"><a href="#Property" class="headerlink" title="Property"></a>Property</h2><p><code>typedef struct objc_property *Property;</code><br><code>typedef struct objc_property *objc_property_t;//这个更常用</code></p>
+<p>可以通过class_copyPropertyList 和 protocol_copyPropertyList 方法获取类和协议中的属性：</p>
+<p><code>objc_property_t *class_copyPropertyList(Class cls, unsigned int *outCount)</code><br><code>objc_property_t *protocol_copyPropertyList(Protocol *proto, unsigned int *outCount)</code></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/进阶/" rel="tag"># 进阶</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/22/iOS-核心动画（-二）/" rel="next" title="iOS 核心动画（ 二）">
+                <i class="fa fa-chevron-left"></i> iOS 核心动画（ 二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/31/block-研究/" rel="prev" title="block 研究">
+                block 研究 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="舟" />
+          <p class="site-author-name" itemprop="name">舟</p>
+           
+              <p class="site-description motion-element" itemprop="description">舟的博客</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://manjusaka.itscoder.com/" title="Manjusaka的博客" target="_blank">Manjusaka的博客</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RunTime-的作用"><span class="nav-number">2.</span> <span class="nav-text">RunTime 的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Objective-C-源代码"><span class="nav-number">2.1.</span> <span class="nav-text">Objective-C 源代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过-Foundation-框架的-NSObject-类定义的方法"><span class="nav-number">2.2.</span> <span class="nav-text">通过 Foundation 框架的 NSObject 类定义的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过对-Runtime-库函数的直接调用"><span class="nav-number">2.3.</span> <span class="nav-text">通过对 Runtime 库函数的直接调用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RunTime-的一些术语"><span class="nav-number">3.</span> <span class="nav-text">RunTime 的一些术语</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SEL"><span class="nav-number">3.1.</span> <span class="nav-text">SEL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#id"><span class="nav-number">3.2.</span> <span class="nav-text">id</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Class"><span class="nav-number">3.3.</span> <span class="nav-text">Class</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Method"><span class="nav-number">3.4.</span> <span class="nav-text">Method</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ivar"><span class="nav-number">3.5.</span> <span class="nav-text">Ivar</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IMP"><span class="nav-number">3.6.</span> <span class="nav-text">IMP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cache"><span class="nav-number">3.7.</span> <span class="nav-text">Cache</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Property"><span class="nav-number">3.8.</span> <span class="nav-text">Property</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">舟</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>
