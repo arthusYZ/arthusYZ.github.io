@@ -97,7 +97,7 @@
 <meta property="og:description" content="关于 blockblock 是 Apple 在 OSX Snow Leopard 和 iOS4中引入的新功能，是 C 语言的扩展，在许多语言里面都有这个功能，一般称为闭包。简而言之，block 就是带有自动变量（局部变量）的匿名函数。
 在 OC 中的实现如下：
 123456789101112131415struct Block_layout &amp;#123;    void *isa;    int">
-<meta property="og:updated_time" content="2017-08-31T09:40:39.000Z">
+<meta property="og:updated_time" content="2017-08-31T09:43:22.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="block 研究">
 <meta name="twitter:description" content="关于 blockblock 是 Apple 在 OSX Snow Leopard 和 iOS4中引入的新功能，是 C 语言的扩展，在许多语言里面都有这个功能，一般称为闭包。简而言之，block 就是带有自动变量（局部变量）的匿名函数。
@@ -448,7 +448,7 @@
 <p>Block里面的__block的地址和Block的地址就相差1052。我们可以很大胆的猜想，__block现在也在堆上了。</p>
 <p>出现这个不同的原因在于这里把Block拷贝到了堆上。</p>
 <p>__forwarding指针这里的作用就是针对堆的Block，把原来__forwarding指针指向自己，换成指向_NSConcreteMallocBlock上复制之后的__block自己。然后堆上的变量的__forwarding再指向自己。这样不管__block怎么复制到堆上，还是在栈上，都可以通过(i-&gt;__forwarding-&gt;i)来访问到变量值。</p>
-<p>所以在<strong>main_block_func_0函数里面就是写的(i-&gt;</strong>forwarding-&gt;i)。</p>
+<p>所以在__main_block_func_0函数里面就是写的(i-&gt;__forwarding-&gt;i)。</p>
 <p>这里还有一个需要注意的地方。还是从例子说起：</p>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//以下代码在MRC中运行</span></div><div class="line">    __block <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%p"</span>,&amp;i);</div><div class="line"></div><div class="line">    <span class="keyword">void</span> (^myBlock)(<span class="keyword">void</span>) = ^&#123;</div><div class="line">        i ++;</div><div class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Block 里面的%p"</span>,&amp;i);</div><div class="line">    &#125;;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>,myBlock);</div><div class="line"></div><div class="line">    myBlock();</div></pre></td></tr></table></figure>
 <p>结果和之前copy的例子完全不同。</p>
