@@ -71,7 +71,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="iOS,基础," />
+  <meta name="keywords" content="iOS,源码笔记," />
 
 
 
@@ -87,18 +87,43 @@
 
 
 
-<meta name="description" content="先看下面的代码：123456-(CGRect)frame&amp;#123;return CGRectMake(self.frame.origin.x,self.frame.origin.y,self.frame.size.width,self.frame.size.height);&amp;#125;-(CGRect)bounds&amp;#123;return CGRectMake(0,0,self.frame.si">
+<meta name="description" content="SDWebImage的结构SDWebImage是iOS开发中几乎必备的库,它主要实现了自动处理网络图片下载缓存并显示在UIButton,UIImageView的功能
+
+上图是这个库的结构,可以看到主要分为以下几个模块:
+
+Downloader:处理图片的下载
+Cache:图片的缓存
+Decoder:图片数据的解析
+Utils:管理工具类,主要API都汇集在这个类中
+Categories:为UIVi">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS中view的frame和bounds区别">
-<meta property="og:url" content="http://yoursite.com/2017/03/13/iOS中view的frame和bounds区别/index.html">
+<meta property="og:title" content="SDWebImage源码解读  - (一)">
+<meta property="og:url" content="http://yoursite.com/2017/12/17/SDWebImage源码解读  - (一)/index.html">
 <meta property="og:site_name" content="舟'Blog">
-<meta property="og:description" content="先看下面的代码：123456-(CGRect)frame&amp;#123;return CGRectMake(self.frame.origin.x,self.frame.origin.y,self.frame.size.width,self.frame.size.height);&amp;#125;-(CGRect)bounds&amp;#123;return CGRectMake(0,0,self.frame.si">
-<meta property="og:image" content="http://img.my.csdn.net/uploads/201303/24/1364058232_8785.jpg">
-<meta property="og:updated_time" content="2017-03-14T11:23:04.000Z">
+<meta property="og:description" content="SDWebImage的结构SDWebImage是iOS开发中几乎必备的库,它主要实现了自动处理网络图片下载缓存并显示在UIButton,UIImageView的功能
+
+上图是这个库的结构,可以看到主要分为以下几个模块:
+
+Downloader:处理图片的下载
+Cache:图片的缓存
+Decoder:图片数据的解析
+Utils:管理工具类,主要API都汇集在这个类中
+Categories:为UIVi">
+<meta property="og:image" content="http://omu22b4eh.bkt.clouddn.com/15159973061398.jpg">
+<meta property="og:image" content="http://omu22b4eh.bkt.clouddn.com/15159981280928.png">
+<meta property="og:updated_time" content="2018-01-24T02:37:12.793Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS中view的frame和bounds区别">
-<meta name="twitter:description" content="先看下面的代码：123456-(CGRect)frame&amp;#123;return CGRectMake(self.frame.origin.x,self.frame.origin.y,self.frame.size.width,self.frame.size.height);&amp;#125;-(CGRect)bounds&amp;#123;return CGRectMake(0,0,self.frame.si">
-<meta name="twitter:image" content="http://img.my.csdn.net/uploads/201303/24/1364058232_8785.jpg">
+<meta name="twitter:title" content="SDWebImage源码解读  - (一)">
+<meta name="twitter:description" content="SDWebImage的结构SDWebImage是iOS开发中几乎必备的库,它主要实现了自动处理网络图片下载缓存并显示在UIButton,UIImageView的功能
+
+上图是这个库的结构,可以看到主要分为以下几个模块:
+
+Downloader:处理图片的下载
+Cache:图片的缓存
+Decoder:图片数据的解析
+Utils:管理工具类,主要API都汇集在这个类中
+Categories:为UIVi">
+<meta name="twitter:image" content="http://omu22b4eh.bkt.clouddn.com/15159973061398.jpg">
 
 
 
@@ -126,13 +151,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/03/13/iOS中view的frame和bounds区别/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/12/17/SDWebImage源码解读  - (一)/"/>
 
 
 
 
 
-  <title> iOS中view的frame和bounds区别 | 舟'Blog </title>
+  <title> SDWebImage源码解读  - (一) | 舟'Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
@@ -251,7 +276,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/13/iOS中view的frame和bounds区别/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/17/SDWebImage源码解读  - (一)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="舟">
@@ -272,7 +297,7 @@
             
             
               
-                iOS中view的frame和bounds区别
+                SDWebImage源码解读  - (一)
               
             
           </h1>
@@ -287,8 +312,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-13T16:14:54+08:00">
-                2017-03-13
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-17T13:38:13+08:00">
+                2017-12-17
               </time>
             
 
@@ -323,9 +348,44 @@
       
 
       
-        <p>先看下面的代码：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">-(<span class="built_in">CGRect</span>)frame&#123;</div><div class="line"><span class="keyword">return</span> <span class="built_in">CGRectMake</span>(<span class="keyword">self</span>.frame.origin.x,<span class="keyword">self</span>.frame.origin.y,<span class="keyword">self</span>.frame.size.width,<span class="keyword">self</span>.frame.size.height);</div><div class="line">&#125;</div><div class="line">-(<span class="built_in">CGRect</span>)bounds&#123;</div><div class="line"><span class="keyword">return</span> <span class="built_in">CGRectMake</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="keyword">self</span>.frame.size.width,<span class="keyword">self</span>.frame.size.height);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>很明显，bounds的原点是(0,0)点（就是view本身的坐标系统，默认永远都是0，0点，除非认为setbounds），而frame的原点却是任意的（相对于父视图中的坐标位置）。</p>
-<p>看过以上代码后再来看这张图：<br><img src="http://img.my.csdn.net/uploads/201303/24/1364058232_8785.jpg" alt=""><br>frame: 该view在父view坐标系统中的位置和大小。（参照点是，父视图的坐标系统）<br>bounds：该view在本地坐标系统中的位置和大小。（参照点是，本地视图坐标系统，就相当于ViewB自己的坐标系统，以0,0点为起点）<br>center：该view的中心点在父view坐标系统中的位置和大小。（参照点是，父视图的坐标系统）<br>基本可以理解为frame与bounds中的size应该一致，而origin不同，bounds的origin在没有更改的情况下默认为（0，0），而frame的origin则不定，通过更改bounds的origin会影响view中所有子视图的位置，更改frame的origin会影响在父视图中的位置。</p>
+        <h2 id="SDWebImage的结构"><a href="#SDWebImage的结构" class="headerlink" title="SDWebImage的结构"></a>SDWebImage的结构</h2><p>SDWebImage是iOS开发中几乎必备的库,它主要实现了自动处理网络图片下载缓存并显示在UIButton,UIImageView的功能</p>
+<p><img src="http://omu22b4eh.bkt.clouddn.com/15159973061398.jpg" alt=""></p>
+<p>上图是这个库的结构,可以看到主要分为以下几个模块:</p>
+<ul>
+<li>Downloader:处理图片的下载</li>
+<li>Cache:图片的缓存</li>
+<li>Decoder:图片数据的解析</li>
+<li>Utils:管理工具类,主要API都汇集在这个类中</li>
+<li>Categories:为UIView,Data,Image等类添加非网络缓存类方法</li>
+<li>WebCacheCategories:平时主要用到的工具,为UIView(UIImageView,UIButton)添加了网络获取图片自动缓存的分类方法</li>
+</ul>
+<h2 id="SDWebImage的主要过程"><a href="#SDWebImage的主要过程" class="headerlink" title="SDWebImage的主要过程"></a>SDWebImage的主要过程</h2><p><img src="http://omu22b4eh.bkt.clouddn.com/15159981280928.png" alt=""></p>
+<p>SDWebImage底层实现有沙盒缓存机制，主要由三块组成</p>
+<ol>
+<li>内存图片缓存</li>
+<li>内存操作缓存</li>
+<li>磁盘沙盒缓存</li>
+</ol>
+<p>入口 <code>setImageWithURL:placeholderImage:options:</code> 会先把 placeholderImage 显示，然后 SDWebImageManager 根据 URL 开始处理图片.</p>
+<p>进入 SDWebImageManager<code>-downloadWithURL:delegate:options:userInfo:</code>，交给 SDImageCache 从缓存查找图片是否已经下载 <code>queryDiskCacheForKey:delegate:userInfo:</code>.</p>
+<p>先从内存图片缓存查找是否有图片，如果内存中已经有图片缓存，SDImageCacheDelegate 回调 <code>imageCache:didFindImage:forKey:userInfo:</code> 到 SDWebImageManager.</p>
+<p>SDWebImageManagerDelegate 回调 <code>webImageManager:didFinishWithImage:</code> 到 UIImageView+WebCache 等前端展示图片.</p>
+<p>如果内存缓存中没有，生成 NSInvocationOperation 添加到队列开始从硬盘查找图片是否已经缓存。</p>
+<p>根据 URLKey 在硬盘缓存目录下尝试读取图片文件。这一步是在 NSOperation 进行的操作，所以回主线程进行结果回调 notifyDelegate:。</p>
+<p>如果上一操作从硬盘读取到了图片，将图片添加到内存缓存中（如果空闲内存过小，会先清空内存缓存）.SDImageCacheDelegate 回调 <code>imageCache:didFindImage:forKey:userInfo:</code>。进而回调展示图片.</p>
+<p>如果从硬盘缓存目录读取不到图片，说明所有缓存都不存在该图片，需要下载图片，回调 <code>imageCache:didNotFindImageForKey:userInfo:</code>.</p>
+<p>共享或重新生成一个下载器 SDWebImageDownloader 开始下载图片.</p>
+<p>图片下载由 NSURLConnection 来做，实现相关 delegate 来判断图片下载中、下载完成和下载失败.</p>
+<p><code>connection:didReceiveData:</code> 中利用 ImageIO 做了按图片下载进度加载效果.</p>
+<p><code>connectionDidFinishLoading:</code> 数据下载完成后交给 SDWebImageDecoder 做图片解码处理.</p>
+<p>图片解码处理在一个 NSOperationQueue 完成，不会拖慢主线程 UI。如果有需要对下载的图片进行二次处理，最好也在这里完成，效率会好很多.</p>
+<p>在主线程 <code>notifyDelegateOnMainThreadWithInfo:</code> 宣告解码完成，<code>imageDecoder:didFinishDecodingImage:userInfo:</code> 回调给 SDWebImageDownloader.</p>
+<p><code>imageDownloader:didFinishWithImage:</code> 回调给 SDWebImageManager 告知图片下载完成.</p>
+<p>通知所有的 downloadDelegates 下载完成，回调给需要的地方展示图片.</p>
+<p>将图片保存到 SDImageCache 中，内存缓存和硬盘缓存同时保存。写文件到硬盘也在以单独 NSInvocationOperation 完成，避免拖慢主线程.</p>
+<p>SDImageCache 在初始化的时候会注册一些消息通知，在内存警告或退到后台的时候清理内存图片缓存，应用结束的时候清理过期图片.</p>
+<p>SDWI 也提供了 UIButton+WebCache 和 MKAnnotationView+WebCache，方便使用.</p>
+<p>SDWebImagePrefetcher 可以预先下载图片，方便后续使用.</p>
 
       
     </div>
@@ -351,7 +411,7 @@
           
             <a href="/tags/iOS/" rel="tag"># iOS</a>
           
-            <a href="/tags/基础/" rel="tag"># 基础</a>
+            <a href="/tags/源码笔记/" rel="tag"># 源码笔记</a>
           
         </div>
       
@@ -364,14 +424,18 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2017/08/31/iOS-开发中的离屏渲染/" rel="next" title="iOS 开发中的离屏渲染">
+                <i class="fa fa-chevron-left"></i> iOS 开发中的离屏渲染
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/03/14/iOS开发中的ScrollView/" rel="prev" title="iOS开发中的ScrollView">
-                iOS开发中的ScrollView <i class="fa fa-chevron-right"></i>
+              <a href="/2017/12/19/SDWebImage源码解读  - (二)/" rel="prev" title="SDWebImage源码解读  - (二)">
+                SDWebImage源码解读  - (二) <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -419,8 +483,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -487,6 +560,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SDWebImage的结构"><span class="nav-number">1.</span> <span class="nav-text">SDWebImage的结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SDWebImage的主要过程"><span class="nav-number">2.</span> <span class="nav-text">SDWebImage的主要过程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
